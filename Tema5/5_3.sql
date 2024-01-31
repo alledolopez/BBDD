@@ -40,9 +40,40 @@ INSERT INTO PRODUCTO(codproducto,nombre,tipo,preciocoste, precioventa, iva) VALU
 INSERT INTO PRODUCTO(codproducto,nombre,tipo,preciocoste, precioventa, iva) VALUES (SEQ_CODPRODUCTO.NEXTVAL, 'JUDIAS', 'V', 18.90, 20.00, 4);
 
 
-
 INSERT INTO LINEAVENTA(CODPRODUCTO, CODVENTA, CANTIDAD) VALUES (50000, 10000, 2);
 INSERT INTO LINEAVENTA(CODPRODUCTO, CODVENTA, CANTIDAD) VALUES (50005, 10001, 5);
 INSERT INTO LINEAVENTA(CODPRODUCTO, CODVENTA, CANTIDAD) VALUES (50010, 10002, 10);
 INSERT INTO LINEAVENTA(CODPRODUCTO, CODVENTA, CANTIDAD) VALUES (50015, 10005, 11);
 INSERT INTO LINEAVENTA(CODPRODUCTO, CODVENTA, CANTIDAD) VALUES (50020, 10010, 9);
+
+
+--a
+SELECT COUNT(*) FROM PRODUCTO WHERE PRECIOCOSTE < PRECIOVENTA/2 ;
+--b
+SELECT MAX (precioventa)  FROM PRODUCTO WHERE IVA =10;
+--c
+SELECT MIN(PRECIOVENTA) FROM PRODUCTO;
+--d
+SELECT COUNT(*) FROM PRODUCTO WHERE TIPO='C' AND preciocoste < precioventa/3;
+--e
+SELECT SUM((PRECIOVENTA*lineaventa.cantidad)-(producto.preciocoste*lineaventa.cantidad)) FROM PRODUCTO, LINEAVENTA WHERE producto.codproducto = lineaventa.codproducto AND TIPO = 'L';
+--f
+SELECT AVG((producto.precioventa-producto.preciocoste)*lineaventa.cantidad) FROM producto, lineaventa WHERE producto.codproducto = lineaventa.codproducto;
+--g
+SELECT TRUNC(PRECIOVENTA, 1),TRUNC(preciocoste, 1) FROM PRODUCTO WHERE NOMBRE LIKE UPPER('L%');
+--h
+SELECT ROUND(PRECIOCOSTE, 1) FROM PRODUCTO WHERE producto.precioventa >  producto.preciocoste * 1.2 AND TIPO IN('H','L');
+--i
+SELECT MOD(PRECIOVENTA, PRECIOCOSTE) FROM PRODUCTO WHERE IVA IN(10,4);
+--j
+SELECT COUNT(*) FROM venta, lineaventa WHERE venta.codventa = lineaventa.codventa;
+--k
+SELECT LOWER(NOMBRE) FROM PRODUCTO WHERE TIPO = 'L';
+
+
+
+
+
+
+
+
