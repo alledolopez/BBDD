@@ -18,7 +18,7 @@ SELECT F.NOMBRE FROM FABRICANTES F WHERE id IN(SELECT P.id_fabricante FROM produ
 --12
 SELECT F.NOMBRE FROM FABRICANTES F WHERE id NOT IN(SELECT P.id_fabricante FROM productos P);
 
-                --APUNTES--
+                --APUNTES ANY, ALL, EXISTS Y NOT EXISTS--
                 -- <ANY === MENOS QUE EL MAXIMO
                 SELECT p.id_fabricante FROM PRODUCTOS P WHERE ID_FABRICANTE <ANY (SELECT ID FROM FABRICANTES WHERE NOMBRE = 'Lenovo' OR NOMBRE = 'Seagate');
                 
