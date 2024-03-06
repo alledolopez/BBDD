@@ -1,0 +1,107 @@
+--ALEJANDRO LLEDO--
+
+CREATE TABLE AMBULANCIA(
+    MATRICULA VARCHAR(7),
+    ANTIGUEDAD NUMBER (2) NOT NULL,
+    FECHA_VALIDEZ_ITV DATE NOT NULL,
+    INCIDENCIAS NUMBER(2) NOT NULL,
+    
+    CONSTRAINT PK_AMBULANCIA PRIMARY KEY(MATRICULA),
+    CONSTRAINT CK_INCIDENCIAS CHECK (INCIDENCIAS BETWEEN 0 AND 50)
+);
+
+CREATE TABLE PACIENTE(
+    DNI VARCHAR(9),
+    NOMBRE VARCHAR(30) NOT NULL,
+    APELLIDO1 VARCHAR(40) NOT NULL,
+    APELLIDO2 VARCHAR(40),
+    NUMERO_PACIENTE NUMBER(4) NOT NULL,
+    
+    CONSTRAINT PK_PACIENTE PRIMARY KEY(DNI),
+    CONSTRAINT U_NUMERO_PACIENTE UNIQUE(NUMERO_PACIENTE)
+);
+CREATE TABLE EMERGENCIA(
+    DNI_PACIENTE VARCHAR(9) NOT NULL,
+    MATRICULA_AMBULANCIA VARCHAR (7) NOT NULL,
+    HOSPITAL VARCHAR(40) NOT NULL,
+    PROVINCIA VARCHAR(15) NOT NULL,
+    FECHA DATE NOT NULL,
+    
+    CONSTRAINT FK_DNI_PACIENTE FOREIGN KEY(DNI_PACIENTE) REFERENCES PACIENTE(DNI) ON DELETE CASCADE,
+    CONSTRAINT FK_MATRICULA_AMBULANCIA FOREIGN KEY(MATRICULA_AMBULANCIA) REFERENCES AMBULANCIA(MATRICULA) ON DELETE CASCADE,
+    CONSTRAINT PK_EMERGENCIA PRIMARY KEY (FECHA, DNI_PACIENTE, MATRICULA_AMBULANCIA),
+    CONSTRAINT CK_PROVINCIA CHECK (PROVINCIA IN ('AVILA', 'BURGOS', 'LEON', 'PALENCIA', 'SALAMANCA', 'SEGOVIA', 'SORIA', 'VALLADOLID', 'ZAMORA'))
+);
+
+
+ALTER TABLE EMERGENCIA ADD SANIDAD VARCHAR(7) NOT NULL;
+
+ALTER TABLE EMERGENCIA ADD CONSTRAINT CK_SANIDAD CHECK (SANIDAD IN ('PRIVADA', 'PUBLICA'));
+
+ALTER TABLE PACIENTE MODIFY NOMBRE VARCHAR(40); 
+
+ALTER TABLE AMBULANCIA ADD CONSTRAINT CK_ANTIGUEDAD CHECK(ANTIGUEDAD BETWEEN 0 AND 25);
+
+ALTER TABLE PACIENTE RENAME COLUMN APELLIDO1 TO PRAPELLIDO;
+ALTER TABLE PACIENTE RENAME COLUMN APELLIDO2 TO SGAPELLIDO;
+
+
+CREATE SEQUENCE SEQ_NUMERO_PACIENTE START WITH 999 INCREMENT BY 1 MAXVALUE 9999 NOCYCLE;
+SELECT SEQ_NUMERO_PACIENTE.NEXTVAL FROM DUAL;
+SELECT SEQ_NUMERO_PACIENTE.CURRVAL FROM DUAL;
+
+SELECT SEQ_NUMERO_PACIENTE.CURRVAL FROM DUAL;
+SELECT SEQ_NUMERO_PACIENTE.NEXTVAL FROM DUAL;
+
+INSERT INTO PACIENTE(dni, nombre, prapellido,sgapellido, numero_paciente) VALUES('93606885J', 'ALVARO', 'HERNANDEZ', 'DIEZ', SEQ_NUMERO_PACIENTE.CURRVAL );
+INSERT INTO PACIENTE(dni, nombre, prapellido,sgapellido, numero_paciente) VALUES('57927673L', 'MARIO', 'MARTIN','', SEQ_NUMERO_PACIENTE.NEXTVAL );
+INSERT INTO PACIENTE(dni, nombre, prapellido,sgapellido, numero_paciente) VALUES('83119803B', 'ANA', 'ALVAREZ','SANCHEZ', SEQ_NUMERO_PACIENTE.NEXTVAL );
+INSERT INTO PACIENTE(dni, nombre, prapellido,sgapellido, numero_paciente) VALUES('31207982H', 'JAVIER', 'GARCIA','GONZALEZ', SEQ_NUMERO_PACIENTE.NEXTVAL );
+
+
+INSERT INTO AMBULANCIA( matricula, antiguedad, fecha_validez_itv, incidencias) VALUES ('5244VBN', 1, '13/12/2026', 0);
+INSERT INTO AMBULANCIA( matricula, antiguedad, fecha_validez_itv, incidencias) VALUES ('2112LYR', 9, '26/05/2024', 6);
+INSERT INTO AMBULANCIA( matricula, antiguedad, fecha_validez_itv, incidencias) VALUES ('2130HGF', 10, '05/11/2025', 16);
+INSERT INTO AMBULANCIA( matricula, antiguedad, fecha_validez_itv, incidencias) VALUES ('9995GVC', 5, '30/08/2024', 22);
+
+
+INSERT INTO EMERGENCIA (dni_paciente, matricula_ambulancia, fecha, hospital, provincia, sanidad) VALUES ('93606885J', '5244VBN', '01/02/2024', 'UNIVERSITARIO DE LEON', 'LEON','PUBLICA');
+INSERT INTO EMERGENCIA (dni_paciente, matricula_ambulancia, fecha, hospital, provincia, sanidad) VALUES ('57927673L', '2130HGF', '20/03/2024', 'VIRGEN DE LA CONCHA', 'ZAMORA','PUBLICA');
+INSERT INTO EMERGENCIA (dni_paciente, matricula_ambulancia, fecha, hospital, provincia, sanidad) VALUES ('83119803B', '9995GVC', '13/04/2024', 'RECOLETAS', 'VALLADOLID','PRIVADA');
+INSERT INTO EMERGENCIA (dni_paciente, matricula_ambulancia, fecha, hospital, provincia, sanidad) VALUES ('31207982H', '2112LYR', '17/04/2024', 'UNIVERSITARIO DE LEON', 'LEON','PUBLICA');
+INSERT INTO EMERGENCIA (dni_paciente, matricula_ambulancia, fecha, hospital, provincia, sanidad) VALUES ('57927673L', '2130HGF', '05/05/2024', 'SAN JUAN DE DIOS', 'BURGOS','PRIVADA');
+INSERT INTO EMERGENCIA (dni_paciente, matricula_ambulancia, fecha, hospital, provincia, sanidad) VALUES ('83119803B', '2112LYR', '23/03/2024', 'NUESTRA SRA. DE SONSOLES', 'AVILA','PUBLICA');
+
+
+    --VISTAS--
+
+--EJERCICIO 1
+CREATE OR REPLACE VIEW pacientes_2024 AS SELECT P.numero_paciente FROM paciente P 
+INNER JOIN emergencia E ON p.dni = e.dni_paciente 
+INNER JOIN ambulancia A ON a.matricula = e.matricula_ambulancia WHERE e.sanidad='PUBLICA'
+AND TO_CHAR(A.FECHA_VALIDEZ_ITV, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY');
+
+--Consulta sobre la vista1
+SELECT P.NOMBRE FROM pacientes_2024, paciente P WHERE pacientes_2024.numero_paciente = p.numero_paciente;
+
+--EJERCICIO 2
+
+CREATE OR REPLACE VIEW PacientesConductures AS SELECT a.matricula, p.dni FROM  paciente P 
+INNER JOIN emergencia E ON e.dni_paciente = p.dni
+INNER JOIN  ambulancia A ON a.matricula = e.matricula_ambulancia 
+WHERE to_char(e.fecha, 'MM') < '03' AND p.dni IN (SELECT paciente.dni FROM paciente WHERE paciente.prapellido LIKE '%Z');
+
+--Consulta sobre la vista 2
+SELECT A.ANTIGUEDAD FROM pacientesconductures , ambulancia A WHERE pacientesconductures.matricula = a.matricula;
+    
+--EJERCICIO 3
+CREATE OR REPLACE VIEW PACIENTES_PUBLICO_PRIVADO AS SELECT a.matricula, p.nombre FROM  paciente P 
+INNER JOIN emergencia E ON e.dni_paciente = p.dni
+INNER JOIN  ambulancia A ON a.matricula = e.matricula_ambulancia 
+WHERE e.sanidad='PRIVADA' UNION SELECT a.matricula, p.nombre FROM paciente P
+INNER JOIN emergencia E ON e.dni_paciente = p.dni
+INNER JOIN  ambulancia A ON a.matricula = e.matricula_ambulancia WHERE e.sanidad='PUBLICA';
+
+--Consulta sobre la vista 3
+SELECT p.dni FROM pacientes_publico_privado, paciente P WHERE pacientes_publico_privado.nombre = p.nombre;
+
