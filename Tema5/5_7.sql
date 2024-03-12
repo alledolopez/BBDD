@@ -19,8 +19,8 @@ INSERT INTO productos VALUES(4, 'GeForce GTX 1050Ti', 185, 7);
 INSERT INTO productos VALUES(5, 'GeForce GTX 1080 Xtreme', 755, 6);
 INSERT INTO productos VALUES(6, 'Monitor 24 LED Full HD', 202, 1);
 INSERT INTO productos VALUES(7, 'Monitor 27 LED Full HD', 245.99, 1);
-INSERT INTO productos VALUES(8, 'Portátil Yoga 520', 559, 2);
-INSERT INTO productos VALUES(9, 'Portátil Ideapd 320', 444, 2);
+INSERT INTO productos VALUES(8, 'Portï¿½til Yoga 520', 559, 2);
+INSERT INTO productos VALUES(9, 'Portï¿½til Ideapd 320', 444, 2);
 INSERT INTO productos VALUES(10, 'Impresora HP Deskjet 3720', 59.99, 3);
 INSERT INTO productos VALUES(11, 'Impresora HP Laserjet Pro M26nw', 180, 3);
 
@@ -34,6 +34,29 @@ INSERT INTO fabricantes VALUES(7, 'Gigabyte');
 INSERT INTO fabricantes VALUES(8, 'Huawei');
 INSERT INTO fabricantes VALUES(9, 'Xiaomi');
 
+--CONSULTAS SOBRE UNA TABLA
+--A
+SELECT P.NOMBRE FROM PRODUCTOS P;
+--B
+SELECT P.NOMBRE AS NOMBRE_PRODUCTO, P.PRECIO AS EUROS, P.PRECIO AS DOLARES FROM PRODUCTOS P;
+--C
+SELECT UPPER(P.NOMBRE), P.PRECIO FROM PRODUCTOS P;
+--D
+SELECT LOWER(P.NOMBRE), P.PRECIO FROM PRODUCTOS P;
+--E
+SELECT ROUND(P.PRECIO) FROM PRODUCTOS P ;
+--F
+SELECT P.NOMBRE, TRUNC(P.PRECIO)  FROM PRODUCTOS P;
+--G
+SELECT f.id FROM FABRICANTES F, PRODUCTOS P WHERE f.id = p.id_fabricante;
+--H
+SELECT DISTINCT(F.ID) FROM PRODUCTOS P, FABRICANTES F WHERE f.id = p.id_fabricante;
+--I
+SELECT F.NOMBRE FROM FABRICANTES F ORDER BY F.NOMBRE DESC;
+--J
+-- SELECT nombre, precio FROM productos ORDER BY precio DESC LIMIT 1;
+
+--CONSULTAS MULTITABLA COMPOSICION EXTERNA--
 --a
 SELECT * FROM FABRICANTES F LEFT JOIN PRODUCTOS P ON p.id_fabricante=f.id;
 --b
@@ -41,7 +64,7 @@ SELECT * FROM FABRICANTES F LEFT JOIN PRODUCTOS P ON p.id_fabricante = f.id WHER
 --c
 /*No, ya que la tabla productos es dependiente de fabricantes y sin un fabricante no podrian existir productos*/
 
---CONSULTAS MULTITABLA--
+--CONSULTAS MULTITABLA COMPOSICION INTERNA--
 --1
 SELECT p.nombre, p.precio, f.nombre FROM PRODUCTOS P INNER JOIN FABRICANTES F ON p.id_fabricante=f.id;
 --2
